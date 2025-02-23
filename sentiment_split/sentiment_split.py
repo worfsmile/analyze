@@ -1,7 +1,7 @@
 import torch
 
 label = torch.load(r"D:\bot_analyze_shortcut\data\bot_classifier_data_analyze\twi-22_label\label.pt")
-sentiment = torch.load(r"D:\bot_analyze_shortcut\data\bot_classifier_data_analyze\twi-22_sentiment\tweets20_sentiment.pt")
+sentiment_label = torch.load(r"D:\bot_analyze_shortcut\data\bot_classifier_data_analyze\twi-22_sentiment\tweets20_sentiment.pt")
 
 bot_indices = torch.nonzero(label == 1).squeeze()
 human_indices = torch.nonzero(label == 0).squeeze()

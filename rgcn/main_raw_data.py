@@ -147,10 +147,10 @@ def main():
             
         print(f'Best Valid Acc: {best_valid["acc"]:.4f}, Best Valid F1: {best_valid["f1"]:.4f}, Best Valid Precision: {best_valid["precision"]:.4f}, Best Valid Recall: {best_valid["recall"]:.4f},')
         print(f'Best Test Acc: {best_test["acc"]:.4f}, Best Test F1: {best_test["f1"]:.4f}, Best Test Precision: {best_test["precision"]:.4f}, Best Test Recall: {best_test["recall"]:.4f},')
-    # print(f'Best Test Acc: {sum(best_test_record["acc"])/len(best_test_record["acc"]):.4f}, Best Test F1: {sum(best_test_record["f1"])/len(best_test_record["f1"]):.4f}, '
-    #       f'Best Test Precision: {sum(best_test_record["precision"])/len(best_test_record["precision"]):.4f}, Best Test Recall: {sum(best_test_record["recall"])/len(best_test_record["recall"]):.4f},')
-    # logging.info(f'Best Test Acc: {sum(best_test_record["acc"])/len(best_test_record["acc"]):.4f}, Best Test F1: {sum(best_test_record["f1"])/len(best_test_record["f1"]):.4f}, '
-    #       f'Best Test Precision: {sum(best_test_record["precision"])/len(best_test_record["precision"]):.4f}, Best Test Recall: {sum(best_test_record["recall"])/len(best_test_record["recall"]):.4f},')
+    print(f'Best Test Acc: {sum(best_test_record["acc"])/len(best_test_record["acc"]):.4f}, Best Test F1: {sum(best_test_record["f1"])/len(best_test_record["f1"]):.4f}, '
+          f'Best Test Precision: {sum(best_test_record["precision"])/len(best_test_record["precision"]):.4f}, Best Test Recall: {sum(best_test_record["recall"])/len(best_test_record["recall"]):.4f},')
+    logging.info(f'Best Test Acc: {sum(best_test_record["acc"])/len(best_test_record["acc"]):.4f}, Best Test F1: {sum(best_test_record["f1"])/len(best_test_record["f1"]):.4f}, '
+          f'Best Test Precision: {sum(best_test_record["precision"])/len(best_test_record["precision"]):.4f}, Best Test Recall: {sum(best_test_record["recall"])/len(best_test_record["recall"]):.4f},')
 
 if __name__ == '__main__':
     main()
