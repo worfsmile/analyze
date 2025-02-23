@@ -19,10 +19,27 @@ from model import MLP
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 setting = {
-    "trial_setting":['mlp', 'raw_data'],
+    "trial_setting":['mlp', 'ood_data'],
     "seeds":[42],
     "save_model": False,
+    "lr": 1e-4,
+    "epochs": 100,
+    "batch_size": 128,
+    "input_size": 768,
+    "output_size": 2,
+    "hidden_size": 128,
+    "num_layers": 2,
+    "early_stop": 50
 }
+    # lr = 1e-4
+    # epochs = 100
+    # batch_size = 128
+    # input_size = 768
+    # output_size = 2
+    # hidden_size = 128
+    # num_layers = 2
+    # early_stop = 50
+
 
 logging_file = f"log/{setting['trial_setting'][0]}/{setting['trial_setting'][1]}/training.log"
 
@@ -48,9 +65,22 @@ def load_data():
     base_path = './data'
     feature_path = os.path.join(base_path, data_name, 'tweets_tensor.pt')
     labels_path = os.path.join(base_path, data_name, 'label.pt')
-    train_idx_path = os.path.join(base_path, data_name, 'train_idx.pt')
-    valid_idx_path = os.path.join(base_path, data_name, 'val_idx.pt')
-    test_idx_path = os.path.join(base_path, data_name, 'test_idx.pt')
+    
+    if setting['trial_setting'][1] == 'raw_data':
+        train_idx_path = os.path.join(base_path, data_name, 'train_idx.pt')
+        valid_idx_path = os.path.join(base_path, data_name, 'val_idx.pt')
+        test_idx_path = os.path.join(base_path, data_name, 'test_idx.pt')
+    
+    elif setting['trial_setting'][1] == 'normal_data':
+        train_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\normal\train.pt"
+        valid_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\normal\val.pt"
+        test_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\normal\test.pt"
+    
+    elif setting['trial_setting'][1] == 'ood_data':
+        #ood
+        train_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\ood\train.pt"
+        valid_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\ood\val.pt"
+        test_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\ood\test.pt"
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -64,14 +94,14 @@ def load_data():
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    lr = 1e-4
-    epochs = 100
-    batch_size = 128
-    input_size = 768
-    output_size = 2
-    hidden_size = 128
-    num_layers = 2
-    early_stop = 50
+    lr = setting['lr']
+    epochs = setting['epochs']
+    batch_size = setting['batch_size']
+    input_size = setting['input_size']
+    output_size = setting['output_size']
+    hidden_size = setting['hidden_size']
+    num_layers = setting['num_layers']
+    early_stop = setting['early_stop']
     
     model = MLP(input_size, output_size, hidden_size, num_layers).to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)

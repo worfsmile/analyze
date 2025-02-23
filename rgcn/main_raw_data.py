@@ -20,7 +20,7 @@ import logging
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 setting = {
-    "trial_setting":['rgcn', 'normal'],
+    "trial_setting":['rgcn', 'ood_data', 'tweets'],
     "seeds":[42],
     "save_model": False,
 }
@@ -41,11 +41,30 @@ def load_data():
     base_path = './data'
     edge_index_path = os.path.join(base_path, data_name, 'edge_index.pt')
     edge_type_path = os.path.join(base_path, data_name, 'edge_type.pt')
-    feature_path = os.path.join(base_path, data_name, 'tweets_tensor.pt')
+    if setting['trial_setting'][2] == 'tweets':
+        feature_path = os.path.join(base_path, data_name, 'tweets_tensor.pt')
+    elif setting['trial_setting'][2] == 'meta':
+        feature_path = os.path.join(base_path, data_name,'meta_tensor.pt')
+    elif setting['trial_setting'][2] == 'verify':
+        feature_path = os.path.join(base_path, data_name,'verify_tensor.pt')
+
     labels_path = os.path.join(base_path, data_name, 'label.pt')
-    train_idx_path = os.path.join(base_path, data_name, 'train_idx.pt')
-    valid_idx_path = os.path.join(base_path, data_name, 'val_idx.pt')
-    test_idx_path = os.path.join(base_path, data_name, 'test_idx.pt')
+
+    if setting['trial_setting'][1] == 'raw_data':
+        train_idx_path = os.path.join(base_path, data_name, 'train_idx.pt')
+        valid_idx_path = os.path.join(base_path, data_name, 'val_idx.pt')
+        test_idx_path = os.path.join(base_path, data_name, 'test_idx.pt')
+    
+    elif setting['trial_setting'][1] == 'normal_data':
+        train_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\normal\train.pt"
+        valid_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\normal\val.pt"
+        test_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\normal\test.pt"
+    
+    elif setting['trial_setting'][1] == 'ood_data':
+        #ood
+        train_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\ood\train.pt"
+        valid_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\ood\val.pt"
+        test_idx_path = r"D:\bot_analyze_shortcut\analyze\sentiment_split\sentiment_split\ood\test.pt"
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -76,24 +95,24 @@ def set_seed(seed):
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+    # Load data
+    train_index, test_index, valid_index, graph = load_data()
     
     lr = 1e-4
     epochs = 100
     batch_size = 128
     num_neighbors = [-1] * 2
     
-    tweet_size = 768
+    tweet_size = graph.x.shape[1]
     embedding_dimension = 128
     dropout = 0.3
-    
-    model = BotRGCN(tweet_size=tweet_size, embedding_dimension=embedding_dimension, dropout=dropout).to(device)
-    
-    # Load data
-    train_index, test_index, valid_index, graph = load_data()
     
     train_loader = create_loaders(graph, train_index, batch_size, num_neighbors)
     val_loader = create_loaders(graph, valid_index, batch_size, [-1,-1])
     test_loader = create_loaders(graph, test_index, batch_size, [-1,-1])
+    
+    model = BotRGCN(tweet_size=tweet_size, embedding_dimension=embedding_dimension, dropout=dropout).to(device)
     
     optimizer = optim.Adam(model.parameters(), lr=lr)
     criterion = nn.CrossEntropyLoss()
@@ -147,6 +166,10 @@ def main():
             
         print(f'Best Valid Acc: {best_valid["acc"]:.4f}, Best Valid F1: {best_valid["f1"]:.4f}, Best Valid Precision: {best_valid["precision"]:.4f}, Best Valid Recall: {best_valid["recall"]:.4f},')
         print(f'Best Test Acc: {best_test["acc"]:.4f}, Best Test F1: {best_test["f1"]:.4f}, Best Test Precision: {best_test["precision"]:.4f}, Best Test Recall: {best_test["recall"]:.4f},')
+        best_test_record['acc'].append(best_test['acc'])
+        best_test_record['f1'].append(best_test['f1'])
+        best_test_record['precision'].append(best_test['precision'])
+        best_test_record['recall'].append(best_test['recall'])
     print(f'Best Test Acc: {sum(best_test_record["acc"])/len(best_test_record["acc"]):.4f}, Best Test F1: {sum(best_test_record["f1"])/len(best_test_record["f1"]):.4f}, '
           f'Best Test Precision: {sum(best_test_record["precision"])/len(best_test_record["precision"]):.4f}, Best Test Recall: {sum(best_test_record["recall"])/len(best_test_record["recall"]):.4f},')
     logging.info(f'Best Test Acc: {sum(best_test_record["acc"])/len(best_test_record["acc"]):.4f}, Best Test F1: {sum(best_test_record["f1"])/len(best_test_record["f1"]):.4f}, '
