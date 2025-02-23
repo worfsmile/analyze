@@ -80,7 +80,7 @@ def main():
     lr = 1e-4
     epochs = 100
     batch_size = 64
-    num_neighbors = [2056] * 2
+    num_neighbors = [-1] * 2
     
     tweet_size = 768
     embedding_dimension = 128
@@ -92,8 +92,8 @@ def main():
     train_index, test_index, valid_index, graph = load_data()
     
     train_loader = create_loaders(graph, train_index, batch_size, num_neighbors)
-    val_loader = create_loaders(graph, valid_index, batch_size, num_neighbors)
-    test_loader = create_loaders(graph, test_index, batch_size,num_neighbors)
+    val_loader = create_loaders(graph, valid_index, batch_size, [-1,-1])
+    test_loader = create_loaders(graph, test_index, batch_size, [-1,-1])
     
     optimizer = optim.Adam(model.parameters(), lr=lr)
     criterion = nn.CrossEntropyLoss()
@@ -112,9 +112,9 @@ def main():
         for epoch in range(1, epochs + 1):
             logging.info("Loading data...")
             
-            train_loss, train_acc, train_f1, train_precision, train_recall = train_one_epoch(model, device, train_loader, optimizer, criterion)
-            valid_acc, valid_f1, valid_precision, valid_recall = test(model, device, val_loader)
-            test_acc, test_f1, test_precision, test_recall = test(model, device, test_loader)
+            train_loss, train_acc, train_f1, train_precision, train_recall = train_one_epoch(model, device, train_loader, optimizer, criterion, train_index)
+            valid_acc, valid_f1, valid_precision, valid_recall = test(model, device, val_loader, valid_index)
+            test_acc, test_f1, test_precision, test_recall = test(model, device, test_loader, test_index)
             
             if valid_acc > best_valid['acc']:
                 best_valid['acc'] = valid_acc

@@ -44,6 +44,9 @@ def train_one_epoch(model, device, loader, optimizer, criterion):
         optimizer.zero_grad()
         output = model(batch.x.to(device), batch.edge_index.to(device), batch.edge_attr.to(device))
         label = batch.y
+        to_deal = batch.input_id
+        label = label[to_deal]
+        output = output[to_deal]
         loss = criterion(output, label)
         loss.backward()
         optimizer.step()
@@ -60,7 +63,7 @@ def train_one_epoch(model, device, loader, optimizer, criterion):
     
     return loss, acc, f1, precision, recall
 
-def test(model, device, loader):
+def test(model, device, loader, idx):
     pred_list = []
     label_list = []
     model.eval()
@@ -68,6 +71,9 @@ def test(model, device, loader):
         for batch in loader:
             output = model(batch.x.to(device), batch.edge_index.to(device), batch.edge_attr.to(device))
             label = batch.y
+            to_deal = batch.input_id
+            label = label[to_deal]
+            output = output[to_deal]
             pred = output.argmax(dim=1, keepdim=True)
             label_list.extend(label.cpu().tolist())
             pred_list.extend(pred.cpu().tolist())
