@@ -20,6 +20,9 @@ def calculate_f1_precision_recall(pred, target):
     pred = pred.to('cpu')
     target = target.to('cpu')
     md = 'weighted'
+    print("target bot radio", torch.sum(target)/len(target))
+    print("pred bot radio", torch.sum(pred)/len(pred))
+    print("bot precision", precision_score(target, pred, labels=[1], average='binary'))
     precision = precision_score(target, pred, average=md)
     recall = recall_score(target, pred, average=md)
     f1 = f1_score(target, pred, average=md)
