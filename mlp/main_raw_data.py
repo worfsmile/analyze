@@ -19,17 +19,17 @@ from model import MLP
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 setting = {
-    "trial_setting":['mlp', 'ood_data'],
+    "trial_setting":['mlp', 'normal_data'],
     "seeds":[42],
     "save_model": False,
     "lr": 1e-4,
-    "epochs": 100,
+    "epochs": 1000,
     "batch_size": 128,
     "input_size": 768,
     "output_size": 2,
     "hidden_size": 128,
     "num_layers": 2,
-    "early_stop": 50
+    "early_stop": 2000
 }
     # lr = 1e-4
     # epochs = 100

@@ -20,7 +20,7 @@ import logging
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 setting = {
-    "trial_setting":['rgcn', 'ood_data', 'tweets'],
+    "trial_setting":['rgcn', 'normal_data', 'tweets'],
     "seeds":[42],
     "save_model": False,
 }
@@ -100,7 +100,7 @@ def main():
     train_index, test_index, valid_index, graph = load_data()
     
     lr = 1e-4
-    epochs = 100
+    epochs = 1000
     batch_size = 128
     num_neighbors = [-1] * 2
     
@@ -113,7 +113,7 @@ def main():
     test_loader = create_loaders(graph, test_index, batch_size, [-1,-1])
     
     model = BotRGCN(tweet_size=tweet_size, embedding_dimension=embedding_dimension, dropout=dropout).to(device)
-    
+    early_stop = 200
     optimizer = optim.Adam(model.parameters(), lr=lr)
     criterion = nn.CrossEntropyLoss()
     best_valid = {'acc': 0, 'f1': 0, 'precision': 0,'recall': 0}
@@ -146,6 +146,11 @@ def main():
                 best_test['recall'] = test_recall
                 if setting['save_model']:
                     torch.save(model.state_dict(), save_model_path)
+            else:
+                early_stop_count += 1
+                if early_stop_count > early_stop:
+                    print(f'Early stop at epoch {epoch}')
+                    break
                     
             print(f'Epoch: {epoch}')
             print(f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Train F1: {train_f1:.4f}, Train Precision: {train_precision:.4f}, Train Recall: {train_recall:.4f},')

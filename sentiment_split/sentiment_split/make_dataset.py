@@ -49,7 +49,6 @@ def make_ood_dataset(train_list, test_list, val_list):
     for i in range(len(test_list)):
         if i == 0 or i == 3:
             test_index.extend(test_list[i])
-            train_index.extend(train_list[i])
     for i in range(len(val_list)):
         val_index.extend(val_list[i])
     
